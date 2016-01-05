@@ -71,6 +71,5 @@ def download_song_list(song_url_list, destination_folder, parallel=False, worker
         pool = multiprocessing.Pool(workers)
         pool.map(download_song_fnx, song_url_list)
     else:
-        for song_url in song_url_list:
-            download_song_fnx(song_url)
+        [download_song_fnx(song_url) for song_url in song_url_list]
 

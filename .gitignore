@@ -5,7 +5,6 @@ __pycache__
 
 .cache
 
-# Testing files
 *.mp3
 url_list.txt
 

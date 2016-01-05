@@ -15,9 +15,15 @@ To download a song given its URL:
 
 	goear-dl -u http://www.goear.com/listen/9fae988/mr-blue-sky-electric-light-orchestra
 	
+You can specify output folder using the `-d` parameter:
+	
+	goear-dl -u http://www.goear.com/listen/9fae988/mr-blue-sky-electric-light-orchestra -d /home/user/Music/
+
+	
 You can download a list of songs using the parameter `-f`:
 
 	goear-dl -f path/to/song_list.txt
+	
 	
 This file has to contain an URL per line:
 
