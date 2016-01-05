@@ -1,11 +1,10 @@
 from string import capwords
-from urllib.parse import quote
 import requests
 import os
-
 from bs4 import BeautifulSoup
 
 from goear_dl.entities import Song
+from goear_dl.compat import url_quote
 
 
 class SongNotFoundError(Exception):
@@ -26,6 +25,8 @@ class GoearSearch(object):
     SONG_BIT_RATE_CLASS = 'kbps'
     SONG_LENGTH_CLASS = 'length'
 
+    SONG_TITLE_META_OG_PROPERTY = 'og:title'
+
     @classmethod
     def search(cls, criteria):
         url = cls.__build_search_url(criteria)
@@ -40,12 +41,14 @@ class GoearSearch(object):
     @classmethod
     def find_by_url(cls, song_url):
         soup = cls.__get_soup(song_url)
-        page_title = soup.title.string
+
+        og_title_tag = soup.find('meta', attrs={'property': cls.SONG_TITLE_META_OG_PROPERTY})
+        og_title = og_title_tag.get('content')
 
         song_url_parts = song_url.split('/')
         song_id = song_url_parts[4]
 
-        title, artist = page_title.split(' - ')
+        title, artist = og_title.split(' - ', maxsplit=1)
         title = capwords(title)
         artist = capwords(artist)
 
@@ -65,7 +68,7 @@ class GoearSearch(object):
 
     @classmethod
     def __build_search_url(cls, criteria, page=1):
-        criteria_encoded = quote(criteria.lower())
+        criteria_encoded = url_quote(criteria.lower())
         url = '{base_url}/{criteria}'.format(base_url=cls.GOEAR_SEARCH, criteria=criteria_encoded)
         if page != 1:
             url = '{base_url}/{page}'.format(base_url=url, page=page)

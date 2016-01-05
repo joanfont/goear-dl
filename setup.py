@@ -12,7 +12,6 @@ setup(
     classifiers=[
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.1',
@@ -38,6 +37,7 @@ setup(
     install_requires=[
         'requests==2.9.1',
         'beautifulsoup4==4.4.1',
+        'six==1.10.0',
     ],
     entry_points={
         'console_scripts': [

@@ -16,7 +16,7 @@ source_group.add_argument('-f', action='store', dest='file', help='Path of the U
 parallel_group = parser.add_argument_group()
 parallel_group.add_argument('-p', action='store_true', dest='parallel', default=False,
                             help='Download song list in parallel mode')
-parallel_group.add_argument('-w', action='store', dest='workers', default=pool_size,
+parallel_group.add_argument('-w', action='store', dest='workers', type=int, default=pool_size,
                             help='Number of processes')
 
 parser.add_argument('-d', action='store', dest='destination', default='', help='File\'s destination folder')
