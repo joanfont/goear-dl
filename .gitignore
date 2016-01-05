@@ -1,0 +1,13 @@
+.idea
+*.pyc
+__pycache__
+.DS_Store
+
+.cache
+
+# Testing files
+*.mp3
+url_list.txt
+
+main.py
+!goear_dl/main.py

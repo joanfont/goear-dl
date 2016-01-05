@@ -1,0 +1,136 @@
+from string import capwords
+from urllib.parse import quote
+
+import requests
+import os
+
+from bs4 import BeautifulSoup
+
+from goear_dl.entities import Song
+
+
+class SongNotFoundError(Exception):
+    pass
+
+
+class GoearSearch(object):
+    GOEAR_SEARCH = 'http://www.goear.com/search'
+    GOEAR_PLAY = 'http://www.goear.com/listen'
+
+    WRAPPER_ID = 'main'
+    LIST_OF_ELEMENTS_CLASS = 'board_list'
+    LIST_ITEM_CLASS = 'board_item'
+    BOARD_CONTENT_CLASS = 'board_content'
+    SONG_URL_PROP = 'redir'
+    SONG_TITLE_CLASS = 'title'
+    SONG_ARTIST_CLASS = 'band'
+    SONG_BIT_RATE_CLASS = 'kbps'
+    SONG_LENGTH_CLASS = 'length'
+
+    @classmethod
+    def search(cls, criteria):
+        url = cls.__build_search_url(criteria)
+        raw_soup = cls.__get_soup(url)
+        soup = raw_soup.find('div', {'id': cls.WRAPPER_ID})
+
+        list_of_elements = soup.find({'ol', cls.LIST_OF_ELEMENTS_CLASS})
+        elements = list_of_elements.find_all('li', {'class': cls.LIST_ITEM_CLASS})
+
+        return map(cls.__get_song_from_list, elements)
+
+    @classmethod
+    def find_by_url(cls, song_url):
+        soup = cls.__get_soup(song_url)
+        page_title = soup.title.string
+
+        song_url_parts = song_url.split('/')
+        song_id = song_url_parts[4]
+
+        title, artist = page_title.split(' - ')
+        title = capwords(title)
+        artist = capwords(artist)
+
+        song_dict = {
+            'song_id': song_id,
+            'title': title,
+            'artist': artist,
+            'url': song_url
+        }
+
+        return Song(**song_dict)
+
+    @classmethod
+    def find_by_id(cls, song_id):
+        song_url = '{base_url}/{song_id}'.format(cls.GOEAR_PLAY, song_id)
+        return cls.find_by_url(song_url)
+
+    @classmethod
+    def __build_search_url(cls, criteria, page=1):
+        criteria_encoded = quote(criteria.lower())
+        url = '{base_url}/{criteria}'.format(base_url=cls.GOEAR_SEARCH, criteria=criteria_encoded)
+        if page != 1:
+            url = '{base_url}/{page}'.format(base_url=url, page=page)
+        return url
+
+    @classmethod
+    def __get_soup(cls, url):
+        response = requests.get(url)
+        html = response.text
+        soup = BeautifulSoup(html, 'html.parser')
+        return soup
+
+    @classmethod
+    def __get_song_from_list(cls, element):
+        ul = element.find('ul', {'class': cls.BOARD_CONTENT_CLASS})
+
+        url = ul.get(cls.SONG_URL_PROP)
+
+        id_parts = url.split('/')
+        song_id = id_parts[4] if len(id_parts) > 4 else None
+
+        title_item = ul.find('li', {'class': cls.SONG_TITLE_CLASS})
+        title = capwords(title_item.text) if title_item else None
+
+        artist_item = ul.find('li', {'class': cls.SONG_ARTIST_CLASS})
+        artist = capwords(artist_item.text) if artist_item else None
+
+        bit_rate = ul.find('li', {'class': cls.SONG_BIT_RATE_CLASS}).text
+        bit_rate_parts = bit_rate.split()
+        bit_rate = bit_rate_parts[0] if bit_rate_parts else None
+
+        length = ul.find('li', {'class': cls.SONG_LENGTH_CLASS}).text
+        length = Song.get_length_from_string(length)
+
+        song_dict = {
+            'song_id': song_id,
+            'title': title,
+            'artist': artist,
+            'bit_rate': bit_rate,
+            'length': length,
+            'url': url
+        }
+
+        return Song(**song_dict)
+
+
+class GoearEngine(object):
+    DOWNLOAD_URL = 'http://www.goear.com/action/sound/get/{song_id}'
+    CHUNK_SIZE = 1024
+
+    @classmethod
+    def download(cls, song, destination_folder=''):
+        song_iter = cls.__download_iter(song)
+        song_path = os.path.join(destination_folder, song.file_name)
+        with open(song_path, 'wb') as f:
+            for block in song_iter:
+                f.write(block)
+
+    @classmethod
+    def __download_iter(cls, song):
+        song_download_url = cls.DOWNLOAD_URL.format(song_id=song.song_id)
+        song_iter = requests.get(song_download_url, stream=True)
+
+        if not song_iter.ok:
+            raise SongNotFoundError()
+
+        return song_iter.iter_content(cls.CHUNK_SIZE)
