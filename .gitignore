@@ -4,6 +4,8 @@ __pycache__
 .DS_Store
 
 .cache
+goear_dl.egg-info
+dist
 
 *.mp3
 url_list.txt
