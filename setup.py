@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 
 from setuptools import setup
+from goear_dl import __version__
 
 setup(
     name='goear_dl',
-    version='0.1',
-    description='an interactive HTTP console',
+    version=__version__,
+    description='download songs from goear',
     author='Joan Font',
     license='GPLv2',
     classifiers=[
@@ -31,7 +32,7 @@ setup(
     keywords='goear download music',
     author_email='joanfont@gmail.com',
     url='https://github.com/joanfont/goear-dl',
-    download_url='https://github.com/joanfont/goear',
+    download_url='https://github.com/joanfont/goear-dl',
 
     packages=['goear_dl'],
     install_requires=[
