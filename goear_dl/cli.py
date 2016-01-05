@@ -1,6 +1,7 @@
 import argparse
-from goear_dl import __version__
 import multiprocessing
+
+from goear_dl import __version__
 
 pool_size = 2 * multiprocessing.cpu_count()
 

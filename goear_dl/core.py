@@ -1,6 +1,5 @@
 from string import capwords
 from urllib.parse import quote
-
 import requests
 import os
 

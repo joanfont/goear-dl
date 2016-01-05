@@ -1,12 +1,11 @@
 import functools
 import re
 import os
-
 import sys
+import multiprocessing
 
 from goear_dl.core import SongNotFoundError, GoearEngine, GoearSearch
 
-import multiprocessing
 
 
 def get_urls_from_file(file_path):
