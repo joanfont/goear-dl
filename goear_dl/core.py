@@ -48,7 +48,7 @@ class GoearSearch(object):
         song_url_parts = song_url.split('/')
         song_id = song_url_parts[4]
 
-        title, artist = og_title.split(' - ', maxsplit=1)
+        title, artist = og_title.split(' - ', 1)
         title = capwords(title)
         artist = capwords(artist)
 
