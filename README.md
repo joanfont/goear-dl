@@ -15,7 +15,7 @@ To download a song given its URL:
 
 	goear-dl -u http://www.goear.com/listen/9fae988/mr-blue-sky-electric-light-orchestra
 	
-You can specify output folder using the `-d` parameter:
+You can specify an output folder using the `-d` parameter:
 	
 	goear-dl -u http://www.goear.com/listen/9fae988/mr-blue-sky-electric-light-orchestra -d /home/user/Music/
 
@@ -32,7 +32,7 @@ This file has to contain an URL per line:
 	http://www.goear.com/listen/2f1b121/confusion-electric-light-orchestra-elo
 	http://www.goear.com/listen/7deba5d/shangri-la-electric-light-orchestra
 	
-If you choosed to download an URL list you can do it in parallel mode. Use `-p` switch to enable-it:
+If you chose to download an URL list you can do it in parallel mode. Use `-p` switch to enable-it:
 
 	goear-dl -f path/to/song_list.txt -p
 	
