@@ -117,10 +117,14 @@ class GoearSearch(object):
 
 class GoearEngine(object):
     DOWNLOAD_URL = 'http://www.goear.com/action/sound/get/{song_id}'
+    PLAYER_SONG_URL = 'http://www.goear.com/playersong/{song_id}'
+    PLAY_URL = 'http://www.goear.com/listen/{song_id}'
+
     CHUNK_SIZE = 1024
 
     @classmethod
     def download(cls, song, destination_folder=''):
+
         song_iter = cls.__download_iter(song)
         song_path = os.path.join(destination_folder, song.file_name)
         with open(song_path, 'wb') as f:
@@ -129,10 +133,32 @@ class GoearEngine(object):
 
     @classmethod
     def __download_iter(cls, song):
-        song_download_url = cls.DOWNLOAD_URL.format(song_id=song.song_id)
-        song_iter = requests.get(song_download_url, stream=True)
+        song_iter = cls.get_song_response(song.song_id)
 
         if not song_iter.ok:
             raise SongNotFoundError()
 
         return song_iter.iter_content(cls.CHUNK_SIZE)
+
+    @classmethod
+    def __get_sesssion(cls):
+        session = requests.session()
+        session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.11; rv:38.0) Gecko/20100101 Firefox/38.0',
+            'Referer': 'http://www.goear.com/npla/swf/soundmanager2_flash9.swf',
+        })
+
+        return session
+
+    @classmethod
+    def get_song_response(cls, song_id):
+        session = cls.__get_sesssion()
+
+        play_url = cls.PLAY_URL.format(song_id=song_id)
+        session.get(play_url)
+
+        player_song_url = cls.PLAYER_SONG_URL.format(song_id=song_id)
+        session.get(player_song_url)
+
+        download_url = cls.DOWNLOAD_URL.format(song_id=song_id)
+        return session.get(download_url, stream=True)
