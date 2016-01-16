@@ -1,5 +1,9 @@
 Changelog
 =========
+### Version 0.1.2
+
+* Fixed bug that caused incorrect song downloads.
+
 
 ### Version 0.1.1
 
