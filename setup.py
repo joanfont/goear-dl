@@ -35,7 +35,7 @@ setup(
 
     packages=['goear_dl'],
     install_requires=[
-        'requests==2.9.1',
+        'requests==2.20.0',
         'beautifulsoup4==4.4.1',
         'six==1.10.0',
     ],
